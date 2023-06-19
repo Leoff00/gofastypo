@@ -13,11 +13,13 @@ func HeaderContainer() *fyne.Container {
 	minOptions = append(minOptions, "1 minute", "2 minutes", "3 minutes")
 
 	optionsSel := widget.NewSelect(minOptions, func(s string) { fmt.Println(s) })
-	optionsSel.PlaceHolder = "Select the minutage: "
+	optionsSel.PlaceHolder = "Select the minutage:"
 
 	startBtn := widget.NewButton("Start!", func() {})
 
-	rowContainer := container.NewHBox(optionsSel, startBtn)
+	timerLb := widget.NewLabel("00:00")
+
+	rowContainer := container.NewHBox(optionsSel, startBtn, timerLb)
 
 	return container.NewVBox(rowContainer)
 }
