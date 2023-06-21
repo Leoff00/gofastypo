@@ -10,8 +10,8 @@ func main() {
 	run := ui.Init(fyne)
 	run.ShowAndRun()
 
-	// g := gen.GenerateArrays{}
-
-	// fmt.Println(g.Generate())
-
 }
+
+// g := gen.GenerateArrays{}
+
+// fmt.Println(g.Generate())

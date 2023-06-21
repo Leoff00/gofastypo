@@ -1,31 +1,38 @@
 package containers
 
 import (
-	"fmt"
-	"log"
 	"strconv"
+	"sync"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
 )
 
-var mutMin string = "01"
+var (
+	mutMin      string = "01"
+	stopCounter        = make(chan bool)
+	mu          sync.Mutex
+)
 
-func beginCounter() *widget.Label {
-	secLeft := binding.NewString()
+// ! and know one way to stop the go routine exec.
+func beginCounter(activate bool, secTimer *widget.Label) {
 	go func() {
 		for i := 59; i >= 0; i-- {
-			if err := secLeft.Set(strconv.Itoa(i)); err != nil {
-				log.Fatal("cannot attribute the var in counter", err)
+			select {
+			case <-stopCounter:
+				return
+			default:
+				time.Sleep(time.Second)
+				secTimer.SetText(strconv.Itoa(i))
 			}
-			fmt.Println(secLeft)
-			time.Sleep(time.Second)
 		}
 	}()
-	return widget.NewLabelWithData(secLeft)
+	if activate {
+		stopCounter <- activate
+		return
+	}
 }
 
 func chooser(selectorStr string) string {
@@ -47,22 +54,35 @@ func HeaderContainer() *fyne.Container {
 	minTimer := widget.NewLabel("00")
 	separator := widget.NewLabel(":")
 	secTimer := widget.NewLabel("00")
+	stopMsg := widget.NewLabel("")
 
 	optionsSel := widget.NewSelect(minOptions, func(s string) {
 		mutMin = chooser(s)
 		minTimer.SetText(mutMin)
 	})
+
 	optionsSel.PlaceHolder = "Select the minutage:"
 
+	stopBtn := widget.NewButton("Stop!", func() {
+		mu.Lock()
+		stopCounter <- true
+		stopMsg.Show()
+		stopMsg.SetText("stopped...")
+		beginCounter(true, secTimer)
+		optionsSel.Enable()
+		mu.Unlock()
+	})
 	startBtn := widget.NewButton("Start!", func() {
-		secLeft := beginCounter()
-		secTimer.SetText(secLeft.Text)
+		mu.Lock()
+		beginCounter(false, secTimer)
+		stopMsg.Hide()
 		optionsSel.Disable()
+		mu.Unlock()
 	})
 
-	timer := container.NewHBox(minTimer, separator, secTimer)
+	timer := container.NewHBox(minTimer, separator, secTimer, stopMsg)
 
-	rowContainer := container.NewHBox(optionsSel, startBtn, timer)
+	rowContainer := container.NewHBox(optionsSel, startBtn, stopBtn, timer)
 	return container.NewVBox(rowContainer)
 
 }
