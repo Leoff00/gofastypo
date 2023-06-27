@@ -16,9 +16,9 @@ and your name is Ada Lovelace`
 light around, you will can see a starlight sky`
 )
 
-type GenerateArrays struct{}
+type GeneratePhrases struct{}
 
-func (g *GenerateArrays) Generate() string {
+func (g *GeneratePhrases) Generate() string {
 	rand.New(rand.NewSource(time.Now().Unix()))
 	phraseArr := make([]string, 0, 3)
 	phraseArr = append(phraseArr, gen1, gen2, gen3)
