@@ -11,7 +11,3 @@ func main() {
 	run.ShowAndRun()
 
 }
-
-// g := gen.GenerateArrays{}
-
-// fmt.Println(g.Generate())
