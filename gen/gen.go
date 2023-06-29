@@ -12,7 +12,7 @@ whats really happens is called fission reaction`
 and your name is Ada Lovelace`
 	gen3 = `If is at night and you go to one place that there aren't
 light around, you will see a starlight sky`
-	gen4 = `The phenomenon known as "ball lightning" is a rare and
+	gen4 = `The phenomenon known as "ball lightning" is a rare and	
 unexplained occurrence where luminous spheres of electricity appear during thunderstorms`
 	gen5 = `Did you know that the Earth's magnetic field is
 constantly shifting and changing its polarity`

@@ -2,6 +2,7 @@ package containers
 
 import (
 	"strings"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -14,39 +15,45 @@ var (
 	g           = gen.GeneratePhrases{}
 	phrase, arr = g.Generate()
 	msgs        = widget.NewLabel(phrase)
-	txtArea     = widget.NewMultiLineEntry()
+	TxtArea     = widget.NewMultiLineEntry()
 )
 
 func capture(input string) {
+
 	checkType := strings.Contains(phrase, input)
 	checkLen := len(input) == len(phrase)
-	zeroLen := len(arr) == 0
+	regen := len(arr) == 2
 
 	if checkType {
 		for i := 0; i < len(arr); i++ {
 			if checkLen {
-				txtArea.SetText("")
+				TxtArea.SetText("")
 				copy(arr[i:], arr[i+1:])
 				arr = arr[:len(arr)-1]
+				time.Sleep(1 * time.Second)
 				phrase = arr[i]
 				msgs.SetText(phrase)
-				if zeroLen {
-					msgs.SetText("")
+				if regen {
+					phrase, arr = g.Generate()
+					phrase = arr[i]
+					msgs.SetText(phrase)
+					return
 				}
 				return
 			}
 		}
+		return
 	}
 }
 
 func TextAreaContainer() *fyne.Container {
-	txtArea.SetPlaceHolder("Type here...")
-	txtArea.MultiLine = true
-	txtArea.Wrapping = fyne.TextWrapWord
+	TxtArea.SetPlaceHolder("Type here...")
+	TxtArea.MultiLine = true
+	TxtArea.Wrapping = fyne.TextWrapWord
 
-	txtArea.OnChanged = capture
+	TxtArea.OnChanged = capture
 
-	txtAreaC := container.NewMax(txtArea)
+	txtAreaC := container.NewMax(TxtArea)
 	handler := container.New(layout.NewGridLayoutWithRows(2), msgs, txtAreaC)
 	return container.NewCenter(handler)
 }

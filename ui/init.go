@@ -17,9 +17,9 @@ func Init(app fyne.App) fyne.Window {
 	window.Resize(fyne.NewSize(600, 400))
 	window.CenterOnScreen()
 
-	c := containers.Composer(containers.HeaderContainer(), containers.TextAreaContainer())
+	c := containers.Composer(containers.HeaderContainer(), containers.MeterContainer(), containers.TextAreaContainer())
 
-	composer := container.New(layout.NewGridLayoutWithRows(3), c.Header, c.Textarea)
+	composer := container.New(layout.NewGridLayoutWithRows(3), c.Header, c.Textarea, c.Meter)
 	window.SetContent(composer)
 	window.SetIcon(theme.ComputerIcon())
 	return window
