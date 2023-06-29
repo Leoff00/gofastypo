@@ -21,7 +21,7 @@ var (
 )
 
 func beginCounter(shouldStop bool, min time.Duration) {
-	Duration = min * time.Second
+	Duration = min * time.Minute
 	if !shouldStop {
 		go func() {
 			for Duration >= 0 {
