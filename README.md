@@ -25,6 +25,12 @@ $ cd gofastypo
 
 # Run the project locally
 $ go run main.go
+
+# Or if you want to compile
+$ go build
+
+# Or
+$ chmod +x ./build.sh
 ```
 
 ## Credits
