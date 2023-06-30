@@ -6,7 +6,6 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/leoff00/gofastypo/gen"
 )
@@ -19,7 +18,6 @@ var (
 )
 
 func capture(input string) {
-
 	checkType := strings.Contains(phrase, input)
 	checkLen := len(input) == len(phrase)
 	regen := len(arr) == 2
@@ -43,6 +41,7 @@ func capture(input string) {
 			}
 		}
 		return
+
 	}
 }
 
@@ -50,10 +49,10 @@ func TextAreaContainer() *fyne.Container {
 	TxtArea.SetPlaceHolder("Type here...")
 	TxtArea.MultiLine = true
 	TxtArea.Wrapping = fyne.TextWrapWord
+	TxtArea.Disable()
 
 	TxtArea.OnChanged = capture
 
-	txtAreaC := container.NewMax(TxtArea)
-	handler := container.New(layout.NewGridLayoutWithRows(2), msgs, txtAreaC)
-	return container.NewCenter(handler)
+	handler := container.NewVBox(container.NewCenter(msgs), TxtArea)
+	return handler
 }

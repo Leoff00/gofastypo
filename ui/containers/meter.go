@@ -20,24 +20,22 @@ var (
 func StartTyping(entry *widget.Entry) {
 	go func() {
 		startTime := time.Now()
-
-		for Duration > 0 {
-			time.Sleep(1 * time.Second)
-
+		for {
+			time.Sleep(time.Second)
 			entryText := entry.Text
 			words := strings.Fields(entryText)
 			wordCount = len(words)
 			wordsPerMinuteLabel = fmt.Sprintf("%.0f words/minute", calculateWordsPerMinute(wordCount, startTime))
 			wpm.SetText(wordsPerMinuteLabel)
-			fmt.Println(words)
-
 		}
 	}()
+
 }
 
-func StopTyping(entry *widget.Entry) {
-	entry.SetText("")
+func StopTyping(txtArea *widget.Entry) {
+	txtArea.SetText("")
 	wpm.SetText(wordsPerMinuteLabel)
+	txtArea.Enable()
 }
 
 func calculateWordsPerMinute(wordCount int, startTime time.Time) float64 {

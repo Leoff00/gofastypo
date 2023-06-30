@@ -28,7 +28,7 @@ type GeneratePhrases struct{}
 
 func (g *GeneratePhrases) Generate() (string, []string) {
 	rand.New(rand.NewSource(time.Now().Unix()))
-	phraseArr := make([]string, 0, 3)
+	phraseArr := make([]string, 0, 8)
 	phraseArr = append(phraseArr, gen1, gen2, gen3, gen4, gen5, gen6, gen7, gen8)
 	return phraseArr[rand.Intn(len(phraseArr))], phraseArr
 }

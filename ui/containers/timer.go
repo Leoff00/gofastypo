@@ -10,12 +10,14 @@ import (
 )
 
 var (
-	mutMin      = 1
 	stopCounter = make(chan bool)
 	minOptions  = make([]string, 0, 3)
+	mutMin      = 1
 
-	counter = widget.NewLabel("")
-	stopMsg = widget.NewLabel("")
+	optionsSel = widget.NewSelect([]string{}, func(s string) {})
+	stopBtn    = widget.NewButton("Stop", func() {})
+	counter    = widget.NewLabel("")
+	stopMsg    = widget.NewLabel("")
 
 	Duration time.Duration
 )
@@ -27,7 +29,7 @@ func beginCounter(shouldStop bool, min time.Duration) {
 			for Duration >= 0 {
 				select {
 				case <-stopCounter:
-					TxtArea.Enable()
+					StopTyping(TxtArea)
 					return
 				default:
 					counter.SetText(Duration.String())
@@ -35,6 +37,8 @@ func beginCounter(shouldStop bool, min time.Duration) {
 					time.Sleep(time.Second)
 					if Duration <= 0 {
 						TxtArea.Disable()
+						stopBtn.Disable()
+						optionsSel.Enable()
 					}
 				}
 			}
@@ -57,26 +61,39 @@ func chooser(selectorStr string) int {
 	return int(sv)
 }
 
+func changeOnStop() {
+	stopMsg.Show()
+	stopMsg.SetText("stopped...")
+	optionsSel.Enable()
+	beginCounter(true, time.Duration(mutMin))
+	stopBtn.Disable()
+}
+
+func changeOnStart() {
+	TxtArea.FocusGained()
+	TxtArea.Enable()
+	msgs.Show()
+	beginCounter(false, time.Duration(mutMin))
+	StartTyping(TxtArea)
+	stopMsg.Hide()
+	optionsSel.Disable()
+	stopBtn.Enable()
+}
+
 func HeaderContainer() *fyne.Container {
 	minOptions = append(minOptions, "1 minute", "2 minutes", "3 minutes")
-	optionsSel := widget.NewSelect(minOptions, func(s string) {
+	optionsSel = widget.NewSelect(minOptions, func(s string) {
 		mutMin = chooser(s)
 	})
 
 	optionsSel.PlaceHolder = "Select the minutage:"
 
-	stopBtn := widget.NewButton("Stop!", func() {
-		stopMsg.Show()
-		stopMsg.SetText("stopped...")
-		optionsSel.Enable()
-		StopTyping(TxtArea)
-		beginCounter(true, time.Duration(mutMin))
-	})
 	startBtn := widget.NewButton("Start!", func() {
-		beginCounter(false, time.Duration(mutMin))
-		StartTyping(TxtArea)
-		stopMsg.Hide()
-		optionsSel.Disable()
+		changeOnStart()
+	})
+
+	stopBtn = widget.NewButton("Stop!", func() {
+		changeOnStop()
 	})
 
 	timer := container.NewHBox(counter, stopMsg)
