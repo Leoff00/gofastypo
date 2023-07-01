@@ -18,7 +18,7 @@ To clone and run this application, you'll need [Git](https://git-scm.com) and [G
 
 ```bash
 # Clone this repository
-$ git clone https://github.com/Leoff00/go-diego-bot.git
+$ git clone https://github.com/Leoff00/gofastypo.git
 
 # Go into the repository
 $ cd gofastypo
