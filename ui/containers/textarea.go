@@ -13,35 +13,42 @@ import (
 var (
 	g           = gen.GeneratePhrases{}
 	phrase, arr = g.Generate()
-	msgs        = widget.NewLabel(phrase)
+	msgs        = widget.NewLabel(gen.BeginPhrase)
 	TxtArea     = widget.NewMultiLineEntry()
 )
 
-func capture(input string) {
+func popPhrases(index int) {
+	TxtArea.SetText("")
+	copy(arr[index:], arr[index+1:])
+	arr = arr[:len(arr)-1]
+	time.Sleep(500 * time.Millisecond)
+	phrase = arr[index]
+	msgs.SetText(phrase)
+}
+
+func regenPhrases(index int) {
+	phrase, arr = g.Generate()
+	phrase = arr[index]
+	msgs.SetText(phrase)
+}
+
+func textAreaLogic(input string) {
 	checkType := strings.Contains(phrase, input)
 	checkLen := len(input) == len(phrase)
-	regen := len(arr) == 2
+	shouldRegen := len(arr) == 2
 
 	if checkType {
 		for i := 0; i < len(arr); i++ {
 			if checkLen {
-				TxtArea.SetText("")
-				copy(arr[i:], arr[i+1:])
-				arr = arr[:len(arr)-1]
-				time.Sleep(1 * time.Second)
-				phrase = arr[i]
-				msgs.SetText(phrase)
-				if regen {
-					phrase, arr = g.Generate()
-					phrase = arr[i]
-					msgs.SetText(phrase)
+				popPhrases(i)
+				if shouldRegen {
+					regenPhrases(i)
 					return
 				}
 				return
 			}
 		}
 		return
-
 	}
 }
 
@@ -51,7 +58,7 @@ func TextAreaContainer() *fyne.Container {
 	TxtArea.Wrapping = fyne.TextWrapWord
 	TxtArea.Disable()
 
-	TxtArea.OnChanged = capture
+	TxtArea.OnChanged = textAreaLogic
 
 	handler := container.NewVBox(container.NewCenter(msgs), TxtArea)
 	return handler
