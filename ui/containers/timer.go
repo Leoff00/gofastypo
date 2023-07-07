@@ -28,14 +28,13 @@ var (
 )
 
 func beginCounter(shouldStop bool, min time.Duration) {
-	// Duration = setCounterMinutes(min)
-	Duration = min * time.Second * 5
+	Duration = setCounterMinutes(min)
 	if !shouldStop {
 		go func() {
 			for Duration >= 0 {
 				select {
 				case <-stopCounter:
-					Duration = min * time.Second * 5
+					Duration = setCounterMinutes(min)
 					StopTyping(TxtArea)
 					return
 				default:
