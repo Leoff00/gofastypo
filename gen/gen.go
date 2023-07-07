@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+const BeginPhrase = `Select the minutage and click in the Start Button
+to begin your test. Gotta GO Fastypo!!!`
+
 const (
 	gen1 = `Did you know that the sun isn't burning
 whats really happens is called fission reaction`
