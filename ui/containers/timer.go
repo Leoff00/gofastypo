@@ -9,6 +9,10 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+func setCounterMinutes(min time.Duration) time.Duration {
+	return min * time.Minute
+}
+
 var (
 	stopCounter = make(chan bool)
 	minOptions  = make([]string, 0, 3)
@@ -16,6 +20,7 @@ var (
 
 	optionsSel = widget.NewSelect([]string{}, func(s string) {})
 	stopBtn    = widget.NewButton("Stop", func() {})
+	startBtn   = widget.NewButton("Stop", func() {})
 	counter    = widget.NewLabel("")
 	stopMsg    = widget.NewLabel("")
 
@@ -23,12 +28,13 @@ var (
 )
 
 func beginCounter(shouldStop bool, min time.Duration) {
-	Duration = min * time.Minute
+	Duration = setCounterMinutes(min)
 	if !shouldStop {
 		go func() {
 			for Duration >= 0 {
 				select {
 				case <-stopCounter:
+					Duration = setCounterMinutes(min)
 					StopTyping(TxtArea)
 					return
 				default:
@@ -36,8 +42,10 @@ func beginCounter(shouldStop bool, min time.Duration) {
 					Duration -= time.Second
 					time.Sleep(time.Second)
 					if Duration <= 0 {
+						StopTyping(TxtArea)
 						TxtArea.Disable()
 						stopBtn.Disable()
+						startBtn.Enable()
 						optionsSel.Enable()
 					}
 				}
@@ -65,11 +73,14 @@ func changeOnStop() {
 	stopMsg.Show()
 	stopMsg.SetText("stopped...")
 	optionsSel.Enable()
-	beginCounter(true, time.Duration(mutMin))
 	stopBtn.Disable()
+	startBtn.Enable()
+	StopTyping(TxtArea)
+	beginCounter(true, time.Duration(mutMin))
 }
 
 func changeOnStart() {
+	msgs.SetText(phrase)
 	TxtArea.FocusGained()
 	TxtArea.Enable()
 	msgs.Show()
@@ -78,23 +89,28 @@ func changeOnStart() {
 	stopMsg.Hide()
 	optionsSel.Disable()
 	stopBtn.Enable()
+	startBtn.Disable()
 }
 
 func HeaderContainer() *fyne.Container {
+
 	minOptions = append(minOptions, "1 minute", "2 minutes", "3 minutes")
 	optionsSel = widget.NewSelect(minOptions, func(s string) {
+		startBtn.Enable()
 		mutMin = chooser(s)
 	})
 
-	optionsSel.PlaceHolder = "Select the minutage:"
-
-	startBtn := widget.NewButton("Start!", func() {
+	startBtn = widget.NewButton("Start!", func() {
 		changeOnStart()
 	})
 
 	stopBtn = widget.NewButton("Stop!", func() {
 		changeOnStop()
 	})
+
+	optionsSel.PlaceHolder = "Select the minutage:"
+	startBtn.Disable()
+	stopBtn.Disable()
 
 	timer := container.NewHBox(counter, stopMsg)
 	rowContainer := container.New(layout.NewGridLayout(4), optionsSel, startBtn, stopBtn, timer)
