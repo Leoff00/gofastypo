@@ -73,14 +73,13 @@ func changeOnStop() {
 	stopMsg.Show()
 	stopMsg.SetText("stopped...")
 	optionsSel.Enable()
-	beginCounter(true, time.Duration(mutMin))
 	stopBtn.Disable()
 	startBtn.Enable()
 	StopTyping(TxtArea)
+	beginCounter(true, time.Duration(mutMin))
 }
 
 func changeOnStart() {
-	phrase, _ := g.Generate()
 	msgs.SetText(phrase)
 	TxtArea.FocusGained()
 	TxtArea.Enable()
