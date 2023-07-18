@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var db *sql.DB
@@ -13,11 +15,13 @@ var err error
 
 func StartDB() {
 
-	if _, err := os.Create("data.db"); err != nil {
+	if _, err = os.Create("data.db"); err != nil {
 		log.Default().Fatal(err)
 	}
 
-	db, err = sql.Open("sqlite3", "data.db")
+	database, err := sql.Open("sqlite3", "data.db")
+
+	db = database
 
 	if err != nil {
 		log.Default().Fatal(err)
@@ -39,8 +43,4 @@ func StartDB() {
 
 	fmt.Println("DB started...")
 
-}
-
-func GetDB() *sql.DB {
-	return db
 }

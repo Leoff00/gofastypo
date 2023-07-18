@@ -1,7 +1,7 @@
 package db
 
 import (
-	"fmt"
+	"database/sql"
 	"log"
 )
 
@@ -10,39 +10,51 @@ type MetricModel struct {
 }
 
 func PersistData(metric float64) {
-	db := GetDB()
+
+	db, err := sql.Open("sqlite3", "./data.db")
+
+	if err != nil {
+		log.Default().Fatal(err)
+	}
+
+	defer db.Close()
 	m := []MetricModel{
 		{Metric: metric},
 	}
 
 	for _, data := range m {
-		_, err = db.Exec("INSERT INTO data (metric) VALUES (?)", data.Metric)
-		if err != nil {
-			log.Fatal(err)
+		if _, err = db.Exec("INSERT INTO metrics (metric) VALUES (?)", data.Metric); err != nil {
+			log.Default().Fatal(err)
 		}
 	}
 }
 
-func GetData() string {
-	var res string
-	db := GetDB()
-	rows, err := db.Query("SELECT * FROM metrics")
+func GetData() []MetricModel {
+	var res []MetricModel
+	db, err := sql.Open("sqlite3", "./data.db")
+
+	if err != nil {
+		log.Default().Fatal(err)
+	}
+
+	defer db.Close()
+	rows, err := db.Query("SELECT DISTINCT metric FROM metrics WHERE metric > 0")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer rows.Close()
 
 	for rows.Next() {
-		var metric float64
-		if err := rows.Scan(&metric); err != nil {
+		var data MetricModel
+		if err := rows.Scan(&data.Metric); err != nil {
 			log.Default().Fatal(err)
 		}
-		res = fmt.Sprintf("%0.f", metric)
-	}
 
+		res = append(res, data)
+	}
 	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
-
 	return res
 }
