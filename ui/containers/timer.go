@@ -9,10 +9,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func setCounterMinutes(min time.Duration) time.Duration {
-	return min * time.Minute
-}
-
 var (
 	stopCounter = make(chan bool)
 	minOptions  = make([]string, 0, 3)
@@ -26,6 +22,10 @@ var (
 
 	Duration time.Duration
 )
+
+func setCounterMinutes(min time.Duration) time.Duration {
+	return min * time.Minute
+}
 
 func changeOnStop() {
 	stopMsg.Show()
