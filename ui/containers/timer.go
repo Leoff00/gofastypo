@@ -33,7 +33,7 @@ func changeOnStop() {
 	optionsSel.Enable()
 	stopBtn.Disable()
 	startBtn.Enable()
-	go StopTyping(TxtArea)
+	StopTyping(TxtArea)
 	beginCounter(true, time.Duration(mutMin))
 }
 
@@ -51,7 +51,7 @@ func changeOnStart() {
 }
 
 func DurationReachesZero() {
-	go StopTyping(TxtArea)
+	StopTyping(TxtArea)
 	TxtArea.Disable()
 	stopBtn.Disable()
 	startBtn.Enable()
@@ -66,7 +66,7 @@ func beginCounter(shouldStop bool, min time.Duration) {
 				select {
 				case <-stopCounter:
 					Duration = setCounterMinutes(min)
-					go StopTyping(TxtArea)
+					StopTyping(TxtArea)
 					return
 				default:
 					counter.SetText(Duration.String())
