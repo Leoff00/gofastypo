@@ -9,10 +9,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func setCounterMinutes(min time.Duration) time.Duration {
-	return min * time.Minute
-}
-
 var (
 	stopCounter = make(chan bool)
 	minOptions  = make([]string, 0, 3)
@@ -20,12 +16,47 @@ var (
 
 	optionsSel = widget.NewSelect([]string{}, func(s string) {})
 	stopBtn    = widget.NewButton("Stop", func() {})
-	startBtn   = widget.NewButton("Stop", func() {})
+	startBtn   = widget.NewButton("Start", func() {})
 	counter    = widget.NewLabel("")
 	stopMsg    = widget.NewLabel("")
 
 	Duration time.Duration
 )
+
+func setCounterMinutes(min time.Duration) time.Duration {
+	return min * time.Minute
+}
+
+func changeOnStop() {
+	stopMsg.Show()
+	stopMsg.SetText("stopped...")
+	optionsSel.Enable()
+	stopBtn.Disable()
+	startBtn.Enable()
+	StopTyping(TxtArea)
+	beginCounter(true, time.Duration(mutMin))
+}
+
+func changeOnStart() {
+	msgs.SetText(phrase)
+	TxtArea.FocusGained()
+	TxtArea.Enable()
+	msgs.Show()
+	StartTyping(TxtArea)
+	beginCounter(false, time.Duration(mutMin))
+	stopMsg.Hide()
+	optionsSel.Disable()
+	stopBtn.Enable()
+	startBtn.Disable()
+}
+
+func DurationReachesZero() {
+	StopTyping(TxtArea)
+	TxtArea.Disable()
+	stopBtn.Disable()
+	startBtn.Enable()
+	optionsSel.Enable()
+}
 
 func beginCounter(shouldStop bool, min time.Duration) {
 	Duration = setCounterMinutes(min)
@@ -42,11 +73,7 @@ func beginCounter(shouldStop bool, min time.Duration) {
 					Duration -= time.Second
 					time.Sleep(time.Second)
 					if Duration <= 0 {
-						StopTyping(TxtArea)
-						TxtArea.Disable()
-						stopBtn.Disable()
-						startBtn.Enable()
-						optionsSel.Enable()
+						go DurationReachesZero()
 					}
 				}
 			}
@@ -69,31 +96,7 @@ func chooser(selectorStr string) int {
 	return int(sv)
 }
 
-func changeOnStop() {
-	stopMsg.Show()
-	stopMsg.SetText("stopped...")
-	optionsSel.Enable()
-	stopBtn.Disable()
-	startBtn.Enable()
-	StopTyping(TxtArea)
-	beginCounter(true, time.Duration(mutMin))
-}
-
-func changeOnStart() {
-	msgs.SetText(phrase)
-	TxtArea.FocusGained()
-	TxtArea.Enable()
-	msgs.Show()
-	beginCounter(false, time.Duration(mutMin))
-	StartTyping(TxtArea)
-	stopMsg.Hide()
-	optionsSel.Disable()
-	stopBtn.Enable()
-	startBtn.Disable()
-}
-
 func HeaderContainer() *fyne.Container {
-
 	minOptions = append(minOptions, "1 minute", "2 minutes", "3 minutes")
 	optionsSel = widget.NewSelect(minOptions, func(s string) {
 		startBtn.Enable()

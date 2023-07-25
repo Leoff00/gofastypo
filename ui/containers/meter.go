@@ -1,8 +1,9 @@
 package containers
 
 import (
-	"fmt"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -12,41 +13,60 @@ import (
 )
 
 var (
-	wordCount           = 0
-	wpm                 = widget.NewLabel("")
-	wordsPerMinuteLabel string
+	mu                     sync.Mutex
+	sharedGoroutineStarted bool
+	storedMetric           float64
+	VisualMetric           string
+	startTime              time.Time
+	wordCount              = 0
+	data                   = []string{"No metrics yet"}
+	metricView             = widget.NewList(
+		func() int {
+			return len(data)
+		},
+		func() fyne.CanvasObject {
+			return widget.NewLabel("No Metrics Yet...")
+		},
+		func(i widget.ListItemID, o fyne.CanvasObject) {
+			o.(*widget.Label).SetText(data[i])
+		})
 )
 
 func StartTyping(entry *widget.Entry) {
-	go func() {
-		startTime := time.Now()
-		for Duration >= 0 {
-			time.Sleep(time.Second)
-			entryText := entry.Text
-			words := strings.Fields(entryText)
-			wordCount = len(words)
-			wordsPerMinuteLabel = fmt.Sprintf("%.0f words/minute", calculateWordsPerMinute(&wordCount, startTime))
-			wpm.SetText(wordsPerMinuteLabel)
-		}
-	}()
+	startTime = time.Now()
+	mu.Lock()
+	if !sharedGoroutineStarted {
+		sharedGoroutineStarted = true
+		mu.Unlock()
 
+		go func() {
+			for {
+				mu.Lock()
+				words := strings.Fields(entry.Text)
+				wordCount = len(words)
+				time.Sleep(time.Second)
+
+				storedMetric = CalculateWordsPerMinute(wordCount, startTime)
+				VisualMetric = strconv.Itoa(int(storedMetric))
+				mu.Unlock()
+				if Duration <= 0 {
+					break
+				}
+			}
+		}()
+	} else {
+		mu.Unlock()
+	}
 }
 
 func StopTyping(txtArea *widget.Entry) {
-	wordsPerMinuteLabel = "0"
-	defaultMsg := fmt.Sprintf("%s words/minute", wordsPerMinuteLabel)
-	wpm.SetText(defaultMsg)
-	txtArea.SetText("")
-	txtArea.Disable()
-	txtArea.FocusGained()
-}
-
-func calculateWordsPerMinute(wordCount *int, startTime time.Time) float64 {
-	elapsedTime := time.Since(startTime).Minutes()
-	wordsPerMinute := float64(*wordCount) / elapsedTime
-	return wordsPerMinute
+	data = ExecuteStopTyping()
 }
 
 func MeterContainer() *fyne.Container {
-	return container.New(layout.NewCenterLayout(), wpm)
+	metricHeader := widget.NewLabel("Your metrics:")
+	savedMetrics := container.NewVScroll(metricView)
+	metricBox := container.NewVBox(metricHeader, savedMetrics)
+	rows := container.New(layout.NewGridLayoutWithRows(1), metricBox)
+	return container.NewCenter(rows)
 }

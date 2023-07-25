@@ -10,6 +10,7 @@ bin/
 *.dll
 *.so
 *.dylib
+data.db
 
 # Test binary, built with `go test -c`
 *.test
