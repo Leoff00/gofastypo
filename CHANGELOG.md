@@ -26,3 +26,20 @@
 - Words per minute meter fixed:
   Now the meter is wiped when you stop the app or if the
   timer reaches zero.
+
+# 1.0.0
+
+## Release
+
+[v1.0.0 - 2023-07-25](https://github.com/Leoff00/gofastypo/releases/tag/1.0.0)
+
+## What’s New?
+
+- New Feature:
+  Now we can save the metric after the time reaches
+  zero or after the time stop.
+
+#
+
+- Go routine recreation:
+  fixed the go routine recreation incident.
