@@ -23,7 +23,7 @@ func (g *GeneratePhrases) readPhrases() []string {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	lines := make([]string, 0)
+	lines := make([]string, 16)
 	phrase := ""
 
 	for scanner.Scan() {
